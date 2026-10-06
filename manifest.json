@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Hyæt-Views Scanner",
+  "version": "1.0.0",
+  "description": "Real-time phishing and heuristic threat detector.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://hyaet-views-api.onrender.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Hyæt-Views Scanner"
+  }
+}
+

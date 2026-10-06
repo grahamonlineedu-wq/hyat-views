@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyæt Views Engine</title>
+    <style>
+        /* Base Themes */
+        :root {
+            --bg-color: #0b132b;
+            --card-bg: #1c2541;
+            --text-color: #ffffff;
+            --accent-color: #ffbc42;
+            --border-color: #3a506b;
+        }
+
+        [data-theme="pure-black"] {
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --text-color: #ffffff;
+            --accent-color: #e50914;
+            --border-color: #282828;
+        }
+
+        [data-theme="cyber-violet"] {
+            --bg-color: #1a0933;
+            --card-bg: #2d1254;
+            --text-color: #f1e4ff;
+            --accent-color: #00ffff;
+            --border-color: #492582;
+        }
+
+        [data-theme="emerald-green"] {
+            --bg-color: #062317;
+            --card-bg: #0d442d;
+            --text-color: #e6fcf2;
+            --accent-color: #39ff14;
+            --border-color: #1b6b47;
+        }
+
+        /* General Layout */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h1 { margin: 0; font-size: 24px; }
+        header p { margin: 5px 0; font-size: 12px; opacity: 0.6; }
+
+        /* Theme Buttons Container */
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .theme-btn {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .theme-btn.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /* Mode Switchers */
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent-color);
+        }
+
+        /* Inputs and Action Buttons */
+        input[type="text"] {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .action-btn {
+            background: var(--accent-color);
+            color: #000000;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Service Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid transparent;
+        }
+
+        .card h3 { margin: 0 0 5px 0; font-size: 14px; opacity: 0.7; }
+        .card p { margin: 0; font-size: 18px; font-weight: bold; }
+
+        /* Report Log Buttons */
+        .log-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-btn {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Recent Scan List */
+        .recent-section h4 { margin: 10px 0; font-size: 14px; color: var(--accent-color); }
+        .recent-header { display: flex; justify-content: space-between; align-items: center; }
+        .clear-btn { background: none; border: none; color: opacity 0.5; cursor: pointer; color: var(--text-color); opacity: 0.5; font-size: 12px; }
+
+        .scan-log-list {
+            font-size: 13px;
+            opacity: 0.8;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .log-item { background: var(--card-bg); padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Hyæt Views Engine</h1>
+        <p>Heuristic & Algorithmic Threat Detection</p>
+    </header>
+
+    <!-- Theme Color Cards System -->
+    <div class="theme-selector">
+        <button class="theme-btn active" onclick="setTheme('navy-blue', this)">Navy Blue</button>
+        <button class="theme-btn" onclick="setTheme('pure-black', this)">Pure Black</button>
+        <button class="theme-btn" onclick="setTheme('cyber-violet', this)">Cyber Violet</button>
+        <button class="theme-btn" onclick="setTheme('emerald-green', this)">Emerald Green</button>
+    </div>
+
+    <!-- Mode Configuration Toggle -->
+    <div class="mode-selector">
+        <button class="mode-btn active" id="singleBtn" onclick="setMode('single')">Single Scan</button>
+        <button class="mode-btn" id="batchBtn" onclick="setMode('batch')">Batch Scan Mode</button>
+    </div>
+
+    <!-- Target Field Entry -->
+    <input type="text" id="targetInput" placeholder="Enter URL or IP address...">
+
+    <!-- Scan Automation Trigger -->
+    <button class="action-btn" id="scanBtn" onclick="executeThreatScan()">Run Deep Scan</button>
+
+    <!-- Service Display Cards Layer -->
+    <div class="card">
+        <h3>Status</h3>
+        <p id="statusValue">READY</p>
+    </div>
+
+    <div class="card">
+        <h3>Reputation Score</h3>
+        <p id="reputationValue">100 / 100</p>
+    </div>
+
+    <div class="card">
+        <h3>Threat Flags</h3>
+        <p id="threatValue">0</p>
+    </div>
+
+    <!-- Report Actions Layer -->
+    <div class="log-actions">
+        <button class="log-btn" onclick="downloadJsonReport()">📥 Download JSON Log</button>
+        <button class="log-btn" onclick="copyTextSummary()">📋 Copy Text Summary</button>
+    </div>
+
+    <!-- Live Active Session Monitoring -->
+    <div class="recent-section">
+        <div class="recent-header">
+            <h4>RECENT SCANS</h4>
+            <button class="clear-btn" onclick="clearLogs()">Clear Log</button>
+        </div>
+        <div class="scan-log-list" id="logList">
+            <div style="opacity:0.5; padding: 5px;" id="emptyLogText">No scan logs available in this session.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Tracking Variables
+    let currentMode = 'single';
+    let lastScanReport = null;
+
+    // 1. Theme Configuration Functionality
+    function setTheme(themeName, element) {
+        document.documentElement.setAttribute('data-theme', themeName);
+        document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    // 2. Scan Mode Alternator Setup
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('singleBtn').classList.toggle('active', mode === 'single');
+        document.getElementById('batchBtn').classList.toggle('active', mode === 'batch');
+        
+        const inputField = document.getElementById('targetInput');
+        if(mode === 'batch') {
+            inputField.placeholder = "Enter multiple URLs/IPs separated by commas...";
+        } else {
+            inputField.placeholder = "Enter URL or IP address...";
+        }
+    }
+
+    // 3. Simulated Heuristic Engine Logic Pipeline
+    function executeThreatScan() {
+        const inputVal = document.getElementById('targetInput').value.trim();
+        if (!inputVal) {
+            alert("Please provide a target valid domain pattern or network address.");
+            return;
+        }
+
+        // Interface adjustments to signify action execution
+        const scanBtn = document.getElementById('scanBtn');
+        const statusVal = document.getElementById('statusValue');
+        scanBtn.disabled = true;
+        scanBtn.innerText = "Scanning Active...";
+        statusVal.innerText = "SCANNING...";
+
+        // Simulation modeling calculation parameters
+        setTimeout(() => {
+            // Generate mock metrics matching standard scanning parameters
+            const detectedFlags = Math.random() > 0.6 ? Math.floor(Math.random() * 5) + 1 : 0;
+            const computedReputation = 100 - (detectedFlags * 15);
+            
+            // Construct report document instance structure 
+            lastScanReport = {
+                timestamp: new Date().toISOString(),
+                target: inputVal,
+                scanMode: currentMode,
+                reputationScore: computedReputation,
+                threatFlags: detectedFlags,
+                engineStatus: "COMPLETED"
+            };
+
+            // Update user interface container properties
+            statusVal.innerText = "COMPLETED";
+        async function loadProducts() {
+           const container = document.getElementById('product-list');
+          try {
+            const res = await fetch('/api/products');  // ← API call
+             const products = await res.json();
+
+   </scripts>
+</body>
+</html>
