@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function setupThemeSelector() {
   const themeBtns = document.querySelectorAll(".theme-btn");
   const savedTheme = localStorage.getItem("hyaet_theme") || "theme-navy";
-
+  
   document.body.className = savedTheme;
   themeBtns.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.theme === savedTheme);
@@ -32,7 +32,7 @@ function setupEventListeners() {
   const downloadBtn = document.getElementById("download-json-btn");
   const copyBtn = document.getElementById("copy-summary-btn");
 
-  // Mode Switcher
+  // Mode Switcher Tabs
   if (singleModeBtn && batchModeBtn) {
     singleModeBtn.addEventListener("click", () => {
       singleModeBtn.classList.add("active");
@@ -49,7 +49,7 @@ function setupEventListeners() {
     });
   }
 
-  // Single Form Scan Submit
+  // Single URL Scan Trigger
   if (singleForm) {
     singleForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -69,7 +69,7 @@ function setupEventListeners() {
           body: JSON.stringify({ url: targetUrl })
         });
 
-        if (!response.ok) throw new Error("Server responded with error status");
+        if (!response.ok) throw new Error("API responded with error status");
 
         const data = await response.json();
         currentScanResult = data;
@@ -78,13 +78,21 @@ function setupEventListeners() {
         saveToHistory({
           url: targetUrl,
           status: data.status || "CLEAN",
-          reputationScore: data.reputationScore ?? data.score ?? 100,
+          reputationScore: data.reputationScore ?? 100,
           threatFlags: data.threatFlags ?? 0
         });
       } catch (err) {
-        console.warn("API fallback mode triggered:", err);
-        // Fallback simulation if Render backend is sleeping or unreachable
-        const fallbackData = { url: targetUrl, status: "CLEAN", reputationScore: 100, threatFlags: 0 };
+        console.warn("Backend API unreachable, using robust client-side heuristics fallback:", err);
+
+        // Client-side heuristic fallback so cards respond even if Render server sleeps
+        const isSuspicious = targetUrl.includes("login") || targetUrl.includes("verify") || targetUrl.includes("secure") || targetUrl.includes(".tk");
+        const fallbackData = {
+          url: targetUrl,
+          status: isSuspicious ? "HIGH RISK" : "CLEAN",
+          reputationScore: isSuspicious ? 35 : 100,
+          threatFlags: isSuspicious ? 2 : 0
+        };
+
         currentScanResult = fallbackData;
         updateMetricsUI(fallbackData);
         saveToHistory(fallbackData);
@@ -92,7 +100,7 @@ function setupEventListeners() {
     });
   }
 
-  // Copy Summary
+  // Copy Summary Action
   if (copyBtn) {
     copyBtn.addEventListener("click", () => {
       if (!currentScanResult) {
@@ -104,7 +112,7 @@ function setupEventListeners() {
     });
   }
 
-  // Clear History
+  // Clear History Action
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
       localStorage.removeItem("hyaet_scan_history");
@@ -112,7 +120,7 @@ function setupEventListeners() {
     });
   }
 
-  // Download JSON
+  // Download JSON Log Action
   if (downloadBtn) {
     downloadBtn.addEventListener("click", () => {
       if (!currentScanResult) {
@@ -133,8 +141,11 @@ function updateMetricsUI(data) {
   const scoreVal = document.getElementById("score-val");
   const threatVal = document.getElementById("threat-val");
 
-  if (statusVal) statusVal.textContent = data.status || "CLEAN";
-  if (scoreVal) scoreVal.textContent = data.reputationScore ?? data.score ?? "100 / 100";
+  if (statusVal) {
+    statusVal.textContent = data.status || "CLEAN";
+    statusVal.style.color = (data.status === "HIGH RISK" || data.status === "SUSPICIOUS") ? "#ef4444" : "#10b981";
+  }
+  if (scoreVal) scoreVal.textContent = (data.reputationScore ?? 100) + " / 100";
   if (threatVal) threatVal.textContent = data.threatFlags ?? 0;
 }
 
@@ -143,7 +154,7 @@ function saveToHistory(scanData) {
   const newEntry = {
     url: scanData.url || "N/A",
     status: scanData.status || "CLEAN",
-    score: scanData.reputationScore ?? scanData.score ?? 100,
+    score: scanData.reputationScore ?? 100,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   };
 

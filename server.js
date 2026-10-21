@@ -7,20 +7,20 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// 1. Core Security & Middleware
+// Middleware Stack
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// 2. Neon PostgreSQL Database Connection
+// Neon PostgreSQL Connection Pool
 const pool = new Pool({
   connectionString: process.env.NEON_DATABASE_URL,
   ssl: {
-    rejectUnauthorized: true, // Enforces full verification instead of false
+    rejectUnauthorized: true // Enforces secure verify-full standard
   }
 });
 
-// Test the Neon database connection on server startup
+// Test Connection
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('Neon PostgreSQL connection error:', err.stack);
@@ -29,30 +29,27 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// 3. Health Check Endpoint
+// Health Endpoint
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    service: 'Hyæt Views Threat Detection API with Neon DB',
+    service: 'Hyæt Views Threat Detection API',
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
 });
 
-// 4. Scan Endpoint with Optional Neon Logging
+// Scan Endpoint
 app.post('/scan', async (req, res) => {
   try {
     const { url } = req.body;
 
     if (!url || typeof url !== 'string' || !url.trim()) {
-      return res.status(400).json({
-        error: 'Invalid request payload. A valid "url" string is required.'
-      });
+      return res.status(400).json({ error: 'A valid "url" string is required.' });
     }
 
     const cleanUrl = url.trim().toLowerCase();
 
-    // Heuristic Analysis Simulation
     let status = 'CLEAN';
     let reputationScore = 100;
     let threatFlags = 0;
@@ -86,28 +83,24 @@ app.post('/scan', async (req, res) => {
       scannedAt: new Date().toISOString()
     };
 
-    // Optional: Log scan results into Neon PostgreSQL if a table exists
+    // Save to Neon Database
     try {
       await pool.query(
         'INSERT INTO scan_logs (url, status, score, flags, created_at) VALUES ($1, $2, $3, $4, NOW()) ON CONFLICT DO NOTHING',
         [scanResult.url, scanResult.status, scanResult.reputationScore, scanResult.threatFlags]
       );
     } catch (dbErr) {
-      // Non-blocking fallback if the table hasn't been manually migrated yet
-      console.warn('Note: Scan result not saved to DB table (table may not exist yet):', dbErr.message);
+      console.warn('Database logging warning:', dbErr.message);
     }
 
     return res.json(scanResult);
 
   } catch (err) {
     console.error('Scan processing error:', err);
-    return res.status(500).json({
-      error: 'Internal server error while processing the threat scan.'
-    });
+    return res.status(500).json({ error: 'Internal server error during scan.' });
   }
 });
 
-// 5. Start Server
 app.listen(PORT, () => {
   console.log(`Hyæt Views API server running on port ${PORT}`);
 });
