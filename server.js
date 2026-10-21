@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -15,7 +16,7 @@ app.use(express.json());
 const pool = new Pool({
   connectionString: process.env.NEON_DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Required for secure cloud PostgreSQL connections
+    rejectUnauthorized: true, // Enforces full verification instead of false
   }
 });
 
