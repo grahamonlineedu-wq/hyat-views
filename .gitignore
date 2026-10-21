@@ -1,2 +1,9 @@
 node_modules/
-*.db
+.env
+.env.local
+.vercel
+*.save
+*.log
+hyat_rules.json
+
+
