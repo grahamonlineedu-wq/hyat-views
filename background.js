@@ -1,20 +1,26 @@
+const API_SCAN = "https://hyat-views.onrender.com/scan";
+
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Hyæt-Views Threat Detector Service Worker Installed.");
+  console.log("Hyæt Views threat detector installed.");
 });
 
-// Listener for explicit scan requests from popup.js
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "scanUrl") {
-    fetch("https://hyaet-views-api.onrender.com/scan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: request.url })
+  if (request.action !== "scanUrl") return;
+
+  fetch(API_SCAN, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: request.url })
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        sendResponse({ success: false, error: data.error || "API status " + response.status });
+        return;
+      }
+      sendResponse({ success: true, data });
     })
-      .then((response) => response.json())
-      .then((data) => sendResponse({ success: true, data: data }))
-      .catch((error) => sendResponse({ success: false, error: error.message }));
+    .catch((error) => sendResponse({ success: false, error: error.message }));
 
-    return true; // Keep message channel open for async response
-  }
+  return true;
 });
-

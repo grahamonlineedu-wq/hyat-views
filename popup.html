@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyæt Views</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { min-width: 320px; }
+    .container { width: 320px; padding: 0.9rem; gap: 0.7rem; }
+    .header h1 { font-size: 1.15rem; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Hyæt Views</h1>
+      <p class="subtitle">Scan the tab you have open</p>
+    </header>
+    <label class="sr-only" for="ext-url-input">Active tab URL</label>
+    <input id="ext-url-input" type="text" readonly />
+    <button type="button" id="scan-active-btn" class="btn-primary">Scan this tab</button>
+    <section class="metrics">
+      <div class="metric-card">
+        <h2>Status</h2>
+        <p id="ext-status">READY</p>
+      </div>
+      <div class="metric-card">
+        <h2>Reputation Score</h2>
+        <p id="ext-score">100 / 100</p>
+      </div>
+    </section>
+    <p id="ext-reasons" class="disclaimer"></p>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

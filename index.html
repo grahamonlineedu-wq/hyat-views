@@ -4,79 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hyæt Views Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="theme-navy">
-  <div class="container">
+<body>
+  <main class="container">
     <header class="header">
+      <p class="engine-pill" id="engine-pill" data-state="checking">Checking API…</p>
       <h1>Hyæt Views Engine</h1>
-      <p class="subtitle">Heuristic & Algorithmic Threat Detection</p>
-      
-      <!-- Theme Selection Bar -->
-      <div class="theme-selector">
-        <span>Theme:</span>
-        <button type="button" class="theme-btn active" data-theme="theme-navy">Navy Blue</button>
-        <button type="button" class="theme-btn" data-theme="theme-pure-black">Pure Black</button>
-        <button type="button" class="theme-btn" data-theme="theme-cyber">Cyber Violet</button>
-        <button type="button" class="theme-btn" data-theme="theme-emerald">Emerald Green</button>
+      <p class="subtitle">Heuristic & algorithmic threat detection</p>
+      <div class="theme-selector" role="group" aria-label="Theme">
+        <button type="button" class="theme-btn active" data-theme="navy">Navy Blue</button>
+        <button type="button" class="theme-btn" data-theme="pure-black">Pure Black</button>
+        <button type="button" class="theme-btn" data-theme="cyber-violet">Cyber Violet</button>
+        <button type="button" class="theme-btn" data-theme="emerald">Emerald Green</button>
       </div>
     </header>
 
-    <!-- Navigation Mode Switcher -->
-    <div class="mode-switcher">
+    <div class="mode-selector">
       <button type="button" id="single-mode-btn" class="mode-btn active">Single Scan</button>
       <button type="button" id="batch-mode-btn" class="mode-btn">Batch Scan Mode</button>
     </div>
 
-    <!-- Single Scan Input Form -->
-    <form id="scan-form" class="scan-form-container">
-      <input type="text" id="scan-input" placeholder="Enter URL or IP address..." required />
-      <button type="submit" id="run-scan-btn" class="btn-primary">Run Deep Scan</button>
+    <form id="scan-form" class="scan-form">
+      <label class="sr-only" for="scan-input">URL or IP address</label>
+      <input id="scan-input" type="text" name="url" placeholder="Enter URL or IP address..." autocomplete="off" required />
+      <button type="submit" class="btn-primary">Run Deep Scan</button>
     </form>
 
-    <!-- Batch Scan Form -->
-    <form id="batch-form" class="scan-form-container" style="display: none;">
-      <textarea id="batch-input" placeholder="Enter one URL per line..." rows="4"></textarea>
-      <button type="submit" id="run-batch-btn" class="btn-primary">Run Batch Deep Scan</button>
+    <form id="batch-form" class="scan-form" hidden>
+      <label class="sr-only" for="batch-input">URLs, one per line</label>
+      <textarea id="batch-input" rows="4" placeholder="One URL or IP per line (max 20)"></textarea>
+      <button type="submit" class="btn-primary">Run Batch Deep Scan</button>
     </form>
 
-    <!-- Metric Displays (Interactive Service Cards) -->
-    <div class="metrics-grid">
-      <div class="metric-card" id="card-status">
-        <h3>Status</h3>
-        <p id="status-val" class="metric-value">READY</p>
-      </div>
+    <section class="metrics" aria-label="Scan results">
+      <button type="button" class="metric-card active" id="card-status" data-card="status">
+        <h2>Status</h2>
+        <p id="status-val" data-tone="ready">READY</p>
+      </button>
+      <button type="button" class="metric-card" id="card-score" data-card="score">
+        <h2>Reputation Score</h2>
+        <p id="score-val">100 / 100</p>
+      </button>
+      <button type="button" class="metric-card" id="card-threats" data-card="flags">
+        <h2>Threat Flags</h2>
+        <p id="threat-val">0</p>
+      </button>
+    </section>
 
-      <div class="metric-card" id="card-score">
-        <h3>Reputation Score</h3>
-        <p id="score-val" class="metric-value">100 / 100</p>
-      </div>
+    <section id="detail-panel" class="detail-panel" aria-live="polite"></section>
 
-      <div class="metric-card" id="card-threats">
-        <h3>Threat Flags</h3>
-        <p id="threat-val" class="metric-value">0</p>
-      </div>
-    </div>
-
-    <!-- Export & Copy Actions -->
     <div class="action-bar">
-      <button type="button" id="download-json-btn" class="btn-secondary">📥 Download JSON Log</button>
-      <button type="button" id="copy-summary-btn" class="btn-secondary">📋 Copy Text Summary</button>
+      <button type="button" id="download-json-btn" class="btn-secondary">Download JSON Log</button>
+      <button type="button" id="copy-summary-btn" class="btn-secondary">Copy Text Summary</button>
     </div>
+    <p id="action-note" class="action-note" aria-live="polite"></p>
 
-    <!-- Scan History Logs -->
-    <div class="history-section">
+    <section class="history-section">
       <div class="history-header">
-        <h2>RECENT SCANS</h2>
-        <button type="button" id="clear-history-btn" class="btn-danger">Clear Log</button>
+        <h2>Recent scans</h2>
+        <button type="button" id="clear-history-btn" class="btn-text">Clear Log</button>
       </div>
-      <div id="history-list" class="history-list">
-        <div style="color: #666666; font-size: 0.85rem; padding: 10px 0;">No scan logs available in this session.</div>
-      </div>
-    </div>
-  </div>
+      <div id="history-list" class="history-list"></div>
+    </section>
 
+    <p class="disclaimer">Heuristic signal only. A clean score is not proof a page is safe. Do not enter passwords on a flagged link.</p>
+  </main>
+  <script src="engine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
-
