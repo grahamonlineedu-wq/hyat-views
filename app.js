@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function setupThemeSelector() {
   const themeBtns = document.querySelectorAll(".theme-btn");
   const savedTheme = localStorage.getItem("hyaet_theme") || "theme-navy";
-  
+
   document.body.className = savedTheme;
   themeBtns.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.theme === savedTheme);
@@ -49,7 +49,7 @@ function setupEventListeners() {
     });
   }
 
-  // Single URL Scan Trigger
+  // Single URL Scan Trigger (Connected to correct Render domain)
   if (singleForm) {
     singleForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -63,7 +63,7 @@ function setupEventListeners() {
       updateMetricsUI({ status: "SCANNING...", reputationScore: "...", threatFlags: "..." });
 
       try {
-        const response = await fetch("https://hyaet-views-api.onrender.com/scan", {
+        const response = await fetch("https://hyat-views.onrender.com/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: targetUrl })
