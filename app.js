@@ -49,7 +49,7 @@ function setupEventListeners() {
     });
   }
 
-  // Single URL Scan Trigger (Connected to correct Render domain)
+  // Single URL Scan Trigger (Connected to live Render API)
   if (singleForm) {
     singleForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -84,7 +84,6 @@ function setupEventListeners() {
       } catch (err) {
         console.warn("Backend API unreachable, using robust client-side heuristics fallback:", err);
 
-        // Client-side heuristic fallback so cards respond even if Render server sleeps
         const isSuspicious = targetUrl.includes("login") || targetUrl.includes("verify") || targetUrl.includes("secure") || targetUrl.includes(".tk");
         const fallbackData = {
           url: targetUrl,
